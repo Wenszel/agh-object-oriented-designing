@@ -1,6 +1,4 @@
-package pl.edu.agh.to.lab4;
-
-import java.util.Calendar;
+package pl.edu.agh.to.lab4.model;
 
 public class Prisoner implements Suspect {
     private final int judgementYear;
@@ -21,18 +19,6 @@ public class Prisoner implements Suspect {
         this.sentenceDuration = sentenceDuration;
     }
 
-    public String getPesel() {
-        return pesel;
-    }
-
-    public boolean isInJail() {
-        return judgementYear + sentenceDuration >= getCurrentYear();
-    }
-
-    public int getCurrentYear() {
-        return Calendar.getInstance().get(Calendar.YEAR);
-    }
-
     @Override
     public String display() {
         return name + " " + surname;
@@ -46,5 +32,10 @@ public class Prisoner implements Suspect {
     @Override
     public String getSurname() {
         return surname;
+    }
+
+    @Override
+    public int getAge() {
+        return 18;
     }
 }

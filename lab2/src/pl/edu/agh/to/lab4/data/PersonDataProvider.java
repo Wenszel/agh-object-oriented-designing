@@ -1,9 +1,13 @@
-package pl.edu.agh.to.lab4;
+package pl.edu.agh.to.lab4.data;
+
+import pl.edu.agh.to.lab4.data.aggregate.SuspectAggregate;
+import pl.edu.agh.to.lab4.model.Person;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
-public class PersonDataProvider {
+public class PersonDataProvider implements SuspectAggregate {
 
     private final Collection<Person> cracovCitizens = new ArrayList<Person>();
 
@@ -21,7 +25,8 @@ public class PersonDataProvider {
         cracovCitizens.add(new Person("Krzysztof", "Mendel", 30));
     }
 
-    public Collection<Person> getAllCracovCitizens() {
-        return cracovCitizens;
+    @Override
+    public Iterator<Person> iterator() {
+        return cracovCitizens.iterator();
     }
 }

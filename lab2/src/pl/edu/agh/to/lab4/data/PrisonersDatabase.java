@@ -1,12 +1,12 @@
-package pl.edu.agh.to.lab4;
+package pl.edu.agh.to.lab4.data;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
+import pl.edu.agh.to.lab4.data.iterator.FlatIterator;
+import pl.edu.agh.to.lab4.data.aggregate.SuspectAggregate;
+import pl.edu.agh.to.lab4.model.Prisoner;
 
-public class PrisonersDatabase {
+import java.util.*;
+
+public class PrisonersDatabase implements SuspectAggregate {
 
   private final Map<String, Collection<Prisoner>> prisonWithPrisoners = new HashMap<String, Collection<Prisoner>>();
 
@@ -21,23 +21,14 @@ public class PrisonersDatabase {
     addPrisoner("Wiezienie centralne", new Prisoner("Janusz", "Podejrzany", "85121212456", 2012, 1));
   }
 
-  public Map<String, Collection<Prisoner>> findAll() {
-    return prisonWithPrisoners;
-  }
-
-  public Collection<String> getAllPrisons() {
-    return prisonWithPrisoners.keySet();
-  }
-
-  public Collection<Prisoner> getAllPrisoners() {
-    return prisonWithPrisoners.values().stream()
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
-  }
-
   private void addPrisoner(String category, Prisoner prisoner) {
     if (!prisonWithPrisoners.containsKey(category))
       prisonWithPrisoners.put(category, new ArrayList<>());
     prisonWithPrisoners.get(category).add(prisoner);
+  }
+
+  @Override
+  public FlatIterator<String, Prisoner> iterator() {
+    return new FlatIterator<>(prisonWithPrisoners);
   }
 }
