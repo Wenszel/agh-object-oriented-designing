@@ -4,6 +4,8 @@ import pl.edu.agh.to.lab4.data.aggregate.CompositeAggregate;
 import pl.edu.agh.to.lab4.model.Suspect;
 import pl.edu.agh.to.lab4.strategy.SearchStrategy;
 
+import java.util.stream.StreamSupport;
+
 public class Finder {
     private final CompositeAggregate compositeAggregate;
 
@@ -12,10 +14,9 @@ public class Finder {
     }
 
     public void displayAllSuspectsWithName(SearchStrategy<Suspect> searchStrategy) {
-        this.compositeAggregate.iterator().forEachRemaining((s) -> {
-            if (searchStrategy.filter(s)) {
-                System.out.println(s.display());
-            }
-        });
+        this.compositeAggregate.stream()
+                .filter(searchStrategy::filter)
+                .map(Suspect::display)
+                .forEach(System.out::println);
     }
 }
