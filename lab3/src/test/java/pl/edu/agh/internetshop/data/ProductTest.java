@@ -1,6 +1,7 @@
-package pl.edu.agh.internetshop;
+package pl.edu.agh.internetshop.data;
 
 import org.junit.jupiter.api.Test;
+import pl.edu.agh.internetshop.data.Product;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static pl.edu.agh.internetshop.util.CustomAssertions.assertBigDecimalCompareValue;

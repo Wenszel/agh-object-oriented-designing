@@ -1,4 +1,4 @@
-package pl.edu.agh.internetshop;
+package pl.edu.agh.internetshop.data;
 
 public class Address {
     private final String name;

@@ -1,4 +1,4 @@
-package pl.edu.agh.internetshop;
+package pl.edu.agh.internetshop.payment;
 
 
 public interface PaymentMethod {

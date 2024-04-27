@@ -1,7 +1,9 @@
-package pl.edu.agh.internetshop;
+package pl.edu.agh.internetshop.shipment;
 
 
 import org.junit.jupiter.api.Test;
+import pl.edu.agh.internetshop.data.Address;
+import pl.edu.agh.internetshop.shipment.Shipment;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;

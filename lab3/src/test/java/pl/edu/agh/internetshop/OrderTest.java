@@ -1,208 +1,106 @@
 package pl.edu.agh.internetshop;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import pl.edu.agh.internetshop.data.User;
+import pl.edu.agh.internetshop.payment.MoneyTransfer;
 
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static pl.edu.agh.internetshop.util.CustomAssertions.assertBigDecimalCompareValue;
+import static org.mockito.Mockito.*;
 
 public class OrderTest {
+    private Order order;
+    private final OrderDetails orderDetails = mock(OrderDetails.class);
+    private final ShipmentManager shipmentManager = mock(ShipmentManager.class);
+    private final PaymentProcessor paymentProcessor = mock(PaymentProcessor.class);
+    private final User user = mock(User.class);
+    private static final BigDecimal TEST_PRICE = new BigDecimal("100.00");
 
-	private Order getOrderWithMockedProduct() {
-		Product product = mock(Product.class);
-		return new Order(product);
-	}
+    @BeforeEach
+    public void setUp() {
+        order = new Order();
+        order.setOrderDetails(orderDetails);
+        order.setShipmentManager(shipmentManager);
+        order.setPaymentProcessor(paymentProcessor);
+        order.setUser(user);
+    }
 
-	@Test
-	public void testGetProductThroughOrder() {
-		// given
-		Product expectedProduct = mock(Product.class);
-		Order order = new Order(expectedProduct);
+    @Test
+    public void testGetPrice_DelegatesToOrderDetailsAndReturnsCorrectValue() {
+        when(orderDetails.getPrice()).thenReturn(TEST_PRICE);
 
-		// when
-		Product actualProduct = order.getProduct();
+        BigDecimal price = order.getPrice();
 
-		// then
-		assertSame(expectedProduct, actualProduct);
-	}
+        assertEquals(TEST_PRICE, price);
+        verify(orderDetails).getPrice();
+    }
 
-	@Test
-	public void testSetShipment() throws Exception {
-		// given
-		Order order = getOrderWithMockedProduct();
-		Shipment expectedShipment = mock(Shipment.class);
+    @Test
+    public void testGetPriceWithTaxes_DelegatesToOrderDetailsAndReturnsCorrectValue() {
+        when(orderDetails.getPriceWithTaxes()).thenReturn(TEST_PRICE);
 
-		// when
-		order.setShipment(expectedShipment);
+        BigDecimal price = order.getPriceWithTaxes();
 
-		// then
-		assertSame(expectedShipment, order.getShipment());
-	}
+        assertEquals(TEST_PRICE, price);
+        verify(orderDetails).getPriceWithTaxes();
+    }
 
-	@Test
-	public void testShipmentWithoutSetting() throws Exception {
-		// given
-		Order order = getOrderWithMockedProduct();
+    @Test
+    public void testGetUserLastname_DelegatesToUserAndReturnsCorrectValue() {
+        String LASTNAME = "Kowalski";
+        when(user.getLastname()).thenReturn(LASTNAME);
 
-		// when
+        String lastname = order.getUserLastname();
 
-		// then
-		assertNull(order.getShipment());
-	}
+        assertEquals(LASTNAME, lastname);
+        verify(user).getLastname();
+    }
 
-	@Test
-	public void testGetPrice() throws Exception {
-		// given
-		BigDecimal expectedProductPrice = BigDecimal.valueOf(1000);
-		Product product = mock(Product.class);
-		given(product.getPrice()).willReturn(expectedProductPrice);
-		Order order = new Order(product);
+    @Test
+    public void testGetUserLastname_whenLastnameIsNull_ReturnsNull() {
+        when(user.getLastname()).thenReturn(null);
 
-		// when
-		BigDecimal actualProductPrice = order.getPrice();
+        String lastname = order.getUserLastname();
 
-		// then
-		assertBigDecimalCompareValue(expectedProductPrice, actualProductPrice);
-	}
+        assertNull(lastname);
+        verify(user).getLastname();
+    }
 
-	private Order getOrderWithCertainProductPrice(double productPriceValue) {
-		BigDecimal productPrice = BigDecimal.valueOf(productPriceValue);
-		Product product = mock(Product.class);
-		given(product.getPrice()).willReturn(productPrice);
-		return new Order(product);
-	}
+    @Test
+    public void testSend_DelegatesToShipmentManager() {
+        order.send();
 
-	@Test
-	public void testPriceWithTaxesWithoutRoundUp() {
-		// given
+        verify(shipmentManager).send();
+    }
 
-		// when
-		Order order = getOrderWithCertainProductPrice(2); // 2 PLN
+    @Test
+    public void testPay_DelegatesToPaymentProcessor() {
+        MoneyTransfer moneyTransfer = mock(MoneyTransfer.class);
+        order.pay(moneyTransfer);
 
-		// then
-		assertBigDecimalCompareValue(order.getPriceWithTaxes(), BigDecimal.valueOf(2.44)); // 2.44 PLN
-	}
+        verify(paymentProcessor).processPayment(moneyTransfer);
+    }
 
-	@Test
-	public void testPriceWithTaxesWithRoundDown() {
-		// given
+    @Test
+    public void testContainsProductByName_DelegatesToOrderDetailsAndReturnsCorrectValue() {
+        String NAME = "Bread";
+        when(orderDetails.containsProductByName(NAME)).thenReturn(true);
 
-		// when
-		Order order = getOrderWithCertainProductPrice(0.01); // 0.01 PLN
+        boolean containsProduct = order.containsProductByName(NAME);
 
-		// then
-		assertBigDecimalCompareValue(order.getPriceWithTaxes(), BigDecimal.valueOf(0.01)); // 0.01 PLN
-																							
-	}
+        assertTrue(containsProduct);
+        verify(orderDetails).containsProductByName(NAME);
+    }
 
-	@Test
-	public void testPriceWithTaxesWithRoundUp() {
-		// given
+    @Test
+    public void testIsSent_DelegatesToShipmentManagerAndReturnsCorrectValue() {
+        when(shipmentManager.isSent()).thenReturn(true);
 
-		// when
-		Order order = getOrderWithCertainProductPrice(0.03); // 0.03 PLN
+        boolean isSent = order.isSent();
 
-		// then
-		assertBigDecimalCompareValue(order.getPriceWithTaxes(), BigDecimal.valueOf(0.04)); // 0.04 PLN
-																							
-	}
-
-	@Test
-	public void testSetShipmentMethod() {
-		// given
-		Order order = getOrderWithMockedProduct();
-		ShipmentMethod surface = mock(SurfaceMailBus.class);
-
-		// when
-		order.setShipmentMethod(surface);
-
-		// then
-		assertSame(surface, order.getShipmentMethod());
-	}
-
-	@Test
-	public void testSending() {
-		// given
-		Order order = getOrderWithMockedProduct();
-		SurfaceMailBus surface = mock(SurfaceMailBus.class);
-		Shipment shipment = mock(Shipment.class);
-		given(shipment.isShipped()).willReturn(true);
-
-		// when
-		order.setShipmentMethod(surface);
-		order.setShipment(shipment);
-		order.send();
-
-		// then
-		assertTrue(order.isSent());
-	}
-
-	@Test
-	public void testIsSentWithoutSending() {
-		// given
-		Order order = getOrderWithMockedProduct();
-		Shipment shipment = mock(Shipment.class);
-		given(shipment.isShipped()).willReturn(true);
-
-		// when
-
-		// then
-		assertFalse(order.isSent());
-	}
-
-	@Test
-	public void testWhetherIdExists() throws Exception {
-		// given
-		Order order = getOrderWithMockedProduct();
-
-		// when
-
-		// then
-		assertNotNull(order.getId());
-	}
-
-	@Test
-	public void testSetPaymentMethod() throws Exception {
-		// given
-		Order order = getOrderWithMockedProduct();
-		PaymentMethod paymentMethod = mock(MoneyTransferPaymentTransaction.class);
-
-		// when
-		order.setPaymentMethod(paymentMethod);
-
-		// then
-		assertSame(paymentMethod, order.getPaymentMethod());
-	}
-
-	@Test
-	public void testPaying() throws Exception {
-		// given
-		Order order = getOrderWithMockedProduct();
-		PaymentMethod paymentMethod = mock(MoneyTransferPaymentTransaction.class);
-		given(paymentMethod.commit(any(MoneyTransfer.class))).willReturn(true);
-		MoneyTransfer moneyTransfer = mock(MoneyTransfer.class);
-		given(moneyTransfer.isCommitted()).willReturn(true);
-
-		// when
-		order.setPaymentMethod(paymentMethod);
-		order.pay(moneyTransfer);
-
-		// then
-		assertTrue(order.isPaid());
-	}
-
-	@Test
-	public void testIsPaidWithoutPaying() throws Exception {
-		// given
-		Order order = getOrderWithMockedProduct();
-
-		// when
-
-		// then
-		assertFalse(order.isPaid());
-	}
+        assertTrue(isSent);
+        verify(shipmentManager).isSent();
+    }
 }

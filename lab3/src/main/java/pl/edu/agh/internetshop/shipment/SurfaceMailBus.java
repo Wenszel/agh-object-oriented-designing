@@ -1,4 +1,4 @@
-package pl.edu.agh.internetshop;
+package pl.edu.agh.internetshop.shipment;
 
 
 public interface SurfaceMailBus extends ShipmentMethod {

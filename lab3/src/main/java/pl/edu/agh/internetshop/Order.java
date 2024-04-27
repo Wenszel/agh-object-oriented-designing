@@ -1,77 +1,79 @@
 package pl.edu.agh.internetshop;
 
+import pl.edu.agh.internetshop.data.User;
+import pl.edu.agh.internetshop.payment.MoneyTransfer;
+
 import java.math.BigDecimal;
 import java.util.UUID;
 
-
 public class Order {
-    private static final BigDecimal TAX_VALUE = BigDecimal.valueOf(1.22);
 	private final UUID id;
-    private final Product product;
-    private boolean paid;
-    private Shipment shipment;
-    private ShipmentMethod shipmentMethod;
-    private PaymentMethod paymentMethod;
+    private User user;
+    private OrderDetails orderDetails;
+    private ShipmentManager shipmentManager;
+    private PaymentProcessor paymentProcessor;
 
-    public Order(Product product) {
-        this.product = product;
-        id = UUID.randomUUID();
-        paid = false;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setPaymentMethod(PaymentMethod paymentMethod) {
-        this.paymentMethod = paymentMethod;
-    }
-
-    public PaymentMethod getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public boolean isSent() {
-        return shipment != null && shipment.isShipped();
-    }
-
-    public boolean isPaid() { return paid; }
-
-    public Shipment getShipment() {
-        return shipment;
+    public Order() {
+        this.id = UUID.randomUUID();
     }
 
     public BigDecimal getPrice() {
-        return product.getPrice();
+        return orderDetails.getPrice();
     }
 
     public BigDecimal getPriceWithTaxes() {
-        return getPrice().multiply(TAX_VALUE).setScale(Product.PRICE_PRECISION, Product.ROUND_STRATEGY);
+        return orderDetails.getPriceWithTaxes();
     }
 
-    public Product getProduct() {
-        return product;
-    }
-
-    public ShipmentMethod getShipmentMethod() {
-        return shipmentMethod;
-    }
-
-    public void setShipmentMethod(ShipmentMethod shipmentMethod) {
-        this.shipmentMethod = shipmentMethod;
+    public String getUserLastname() {
+        return user.getLastname();
     }
 
     public void send() {
-        boolean sentSuccesful = getShipmentMethod().send(shipment, shipment.getSenderAddress(), shipment.getRecipientAddress());
-        shipment.setShipped(sentSuccesful);
+        shipmentManager.send();
     }
 
     public void pay(MoneyTransfer moneyTransfer) {
-        moneyTransfer.setCommitted(getPaymentMethod().commit(moneyTransfer));
-        paid = moneyTransfer.isCommitted();
+        paymentProcessor.processPayment(moneyTransfer);
     }
 
-    public void setShipment(Shipment shipment) {
-        this.shipment = shipment;
+    public boolean containsProductByName(String name) {
+        return orderDetails.containsProductByName(name);
+    }
+
+    public boolean isSent() {
+        return shipmentManager.isSent();
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public OrderDetails getOrderDetails() {
+        return orderDetails;
+    }
+
+    public void setOrderDetails(OrderDetails orderDetails) {
+        this.orderDetails = orderDetails;
+    }
+
+    public ShipmentManager getShipmentManager() {
+        return shipmentManager;
+    }
+
+    public void setShipmentManager(ShipmentManager shipmentManager) {
+        this.shipmentManager = shipmentManager;
+    }
+
+    public PaymentProcessor getPaymentProcessor() {
+        return paymentProcessor;
+    }
+
+    public void setPaymentProcessor(PaymentProcessor paymentProcessor) {
+        this.paymentProcessor = paymentProcessor;
     }
 }

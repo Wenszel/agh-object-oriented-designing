@@ -1,6 +1,7 @@
-package pl.edu.agh.internetshop;
+package pl.edu.agh.internetshop.payment;
 
 import org.junit.jupiter.api.Test;
+import pl.edu.agh.internetshop.payment.MoneyTransfer;
 
 import java.math.BigInteger;
 
@@ -16,12 +17,8 @@ public class MoneyTransferTest {
 	
     @Test
     public void testCreation() {
-    	// given
-
-        // when
     	MoneyTransfer moneyTransfer = new MoneyTransfer(ACCOUNT_NUMBER, OWNER_DETAILS, DESCRIPTION, AMOUNT);
         
-        // then
     	assertEquals(ACCOUNT_NUMBER, moneyTransfer.getAccountNumber());
     	assertEquals(OWNER_DETAILS, moneyTransfer.getOwnerDetails());
     	assertEquals(DESCRIPTION, moneyTransfer.getDescription());
@@ -29,26 +26,18 @@ public class MoneyTransferTest {
     }
 
     @Test
-    public void testCheckCommitFlagWithoutCommitting() throws Exception {
-    	// given
+    public void testCheckCommitFlagWithoutCommitting() {
     	MoneyTransfer moneyTransfer = new MoneyTransfer(ACCOUNT_NUMBER, OWNER_DETAILS, DESCRIPTION, AMOUNT);
     	
-    	// when
-    	
-    	
-    	// then
     	assertFalse(moneyTransfer.isCommitted());
     }
     
     @Test
-    public void testCheckCommitFlagWithCommitting() throws Exception {
-    	// given
+    public void testCheckCommitFlagWithCommitting() {
     	MoneyTransfer moneyTransfer = new MoneyTransfer(ACCOUNT_NUMBER, OWNER_DETAILS, DESCRIPTION, AMOUNT);
     	
-    	// when
     	moneyTransfer.setCommitted(true);
     	
-    	// then
     	assertTrue(moneyTransfer.isCommitted());
     }
 }
