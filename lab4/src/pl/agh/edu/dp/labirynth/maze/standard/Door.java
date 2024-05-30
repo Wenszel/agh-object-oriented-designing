@@ -1,4 +1,6 @@
-package pl.agh.edu.dp.labirynth;
+package pl.agh.edu.dp.labirynth.maze.standard;
+
+import pl.agh.edu.dp.labirynth.MapSite;
 
 public class Door extends MapSite {
     private Room room1;

@@ -1,5 +1,12 @@
 package pl.agh.edu.dp.labirynth;
 
+import pl.agh.edu.dp.labirynth.builder.MazeBuilder;
+import pl.agh.edu.dp.labirynth.factory.MazeFactory;
+import pl.agh.edu.dp.labirynth.maze.standard.Door;
+import pl.agh.edu.dp.labirynth.maze.standard.Maze;
+import pl.agh.edu.dp.labirynth.maze.standard.Room;
+import pl.agh.edu.dp.labirynth.maze.standard.Wall;
+
 public class MazeGame {
     public Maze createMaze(){
         Maze maze = new Maze();
@@ -24,4 +31,11 @@ public class MazeGame {
 
         return maze;
     }
+
+    //Adding this method delegates responsibility of creating a new maze to MazeBuilder object
+    public Maze createMaze(MazeBuilder builder) {
+        return builder.build();
+    }
+
+
 }
